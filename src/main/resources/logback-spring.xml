@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="app.name" value="mevzuat-search-api" />
+	<property name="app.log.dir" value="/opt/webgumruk/mevzuat-search-api/log" />
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="FILE-AUDIT"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${app.log.dir}/${app.name}.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n
+			</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${app.log.dir}/archived/${app.name}.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+	</appender>
+
+	<!-- perf4j -->
+	<appender name="statsAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${app.log.dir}/${app.name}_perf.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+			</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${app.log.dir}/archived/${app.name}_perf.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+	
+	<appender name="coalescingStatistics"
+		class="org.perf4j.logback.AsyncCoalescingStatisticsAppender">
+		<param name="TimeSlice" value="60000" />
+		<appender-ref ref="statsAppender" />
+		<appender-ref ref="STDOUT" />
+	</appender>
+	
+	<springProfile name="production">
+		<logger name="org.jboss" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.hibernate" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.apache" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.mchange" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+	
+		<logger name="com.evrim.webgumruk" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.evrim.mevzuat" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.springframework" level="ERROR" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+
+		<logger name="org.perf4j.TimingLogger" additivity="false">
+			<level value="INFO" />
+			<appender-ref ref="coalescingStatistics" />
+			<appender-ref ref="statsAppender" />
+		</logger>
+		
+		<root level="INFO">
+			<appender-ref ref="STDOUT" />
+		</root>
+	</springProfile>
+	
+	<springProfile name="dev">
+		<logger name="org.jboss" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.hibernate" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.apache" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.mchange" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+	
+		<logger name="com.evrim.webgumruk" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.evrim.mevzuat" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.springframework" level="INFO" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+
+		<logger name="org.perf4j.TimingLogger" additivity="true">
+			<level value="INFO" />
+			<appender-ref ref="coalescingStatistics" />
+			<appender-ref ref="statsAppender" />
+		</logger>
+		
+		<root level="DEBUG">
+			<appender-ref ref="STDOUT" />
+		</root>
+	</springProfile>
+
+	<springProfile name="test">
+		<logger name="org.jboss" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.hibernate" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.apache" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.mchange" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+	
+		<logger name="com.evrim.webgumruk" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.evrim.mevzuat" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.springframework" level="INFO" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+
+		<logger name="org.perf4j.TimingLogger" additivity="true">
+			<level value="INFO" />
+			<appender-ref ref="coalescingStatistics" />
+			<appender-ref ref="statsAppender" />
+		</logger>
+		
+		<root level="DEBUG">
+			<appender-ref ref="STDOUT" />
+		</root>
+	</springProfile>
+
+	<springProfile name="local">
+		<logger name="org.jboss" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.hibernate" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.hibernate.type" level="TRACE" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.apache" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.mchange" level="ERROR" additivity="false">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+	
+		<logger name="com.evrim.webgumruk" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="com.evrim.mevzuat" level="DEBUG" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+		
+		<logger name="org.springframework" level="INFO" additivity="true">
+			<appender-ref ref="FILE-AUDIT" />
+		</logger>
+
+		<logger name="org.perf4j.TimingLogger" additivity="true">
+			<level value="INFO" />
+			<appender-ref ref="coalescingStatistics" />
+			<appender-ref ref="statsAppender" />
+		</logger>
+		
+		<root level="DEBUG">
+			<appender-ref ref="STDOUT" />
+		</root>
+	</springProfile>
+
+</configuration>

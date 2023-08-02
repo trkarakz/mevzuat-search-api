@@ -1,0 +1,38 @@
+
+SOLR INSTALLATION, AND USAGE TUTORIAL
+
+A : Installation
+
+	download solr application (zip, or tar.gz or ...) package and extract it some folder (/opt/solr-6.3.0)
+
+	Note: solr home directory is ./server/solr/
+	Note: configsets directory is ./server/solr/configsets/
+	Note: solr ide : htttp://localhost:8983/solr
+	
+B : Configure mevzuat_file collection, and create it
+	B.1 : copy basic_configs directory as mevzuat_file_configs (in the configsets directory)
+	
+	B.2 : write our managed-schema-mevzuat_file file (solr schema config file) to  mevzuat_file_configs/conf/managed-schema
+	
+	B.3 : start solr using bin/solr start -c (start solr in cloud mode)
+	
+	B.4 : create mevzuat file collection using this command
+		bin/solr create_collection -c mevzuat_file -d mevzuat_file_configs -shards 2 -replicationFactor 2
+	
+	
+C : Userful commands
+
+	C.1 : Starting solr
+		bin/solr start -c (start solr in cloud mode)
+	
+	C.2 : Stopping solr
+		bin/solr stop -all (stop all solr instances)
+	
+	C.3 : Create a collection named mevzuat_file and configset is mevzuat_file_configs
+		bin/solr create_collection -c mevzuat_file -d mevzuat_file_configs -shards 2 -replicationFactor 2
+
+	C.4 : Delete a collection named mevzuat_file
+		bin/solr delete -c mevzuat_file
+	
+	C.5 : Upconfig
+		bin/solr zk upconfig -z localhost -n mevzuat_file_configs -d server/solr/configsets/mevzuat_file_configs/conf/
